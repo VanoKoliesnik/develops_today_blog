@@ -1,8 +1,33 @@
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { useRouter } from "next/router";
 import { connect } from "react-redux";
+import styled from "styled-components";
+
+import Header from "../../components/Header";
 
 import { fetchPostById } from "../../components/actions/post";
+import { IPost } from "../../types";
+
+const StyledMain = styled.main`
+	padding: 20px;
+	padding-top: 80px;
+`;
+
+interface IPostItemProps {
+	post: {
+		post: IPost;
+	};
+}
+
+const PostItem: FC<IPostItemProps> = ({ post }) => {
+	return (
+		<div>
+			<h2>{post.post.title}</h2>
+
+			<p>{post.post.body}</p>
+		</div>
+	);
+};
 
 const Post = ({ dispatch, post }) => {
 	const { id } = useRouter().query;
@@ -13,9 +38,9 @@ const Post = ({ dispatch, post }) => {
 
 	return (
 		<>
-			<div>Post_id is {id}</div>
+			<Header />
 
-			{post ? <div>{post.post.title}</div> : <p>Loading ...</p>}
+			<StyledMain>{post ? <PostItem post={post} /> : <p>Loading ...</p>}</StyledMain>
 		</>
 	);
 };

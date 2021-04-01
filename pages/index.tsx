@@ -1,27 +1,32 @@
-import React, { useEffect } from "react";
-import { connect } from "react-redux";
+import React from "react";
+import styled from "styled-components";
+import Head from "next/head";
 
-import { fetchListPosts } from "../components/actions/listPosts";
-import { IPost } from "../types";
+import Header from "../components/Header";
+import ListPosts from "../components/ListPosts";
 
-const Index = ({ dispatch, listPosts }) => {
-	useEffect(() => {
-		dispatch(fetchListPosts());
-	}, [dispatch]);
+const StyledMain = styled.main`
+	padding: 20px;
+	padding-top: 80px;
+	height: 100vh;
+`;
 
+const Index = () => {
 	return (
-		<div>
-			<ul>
-				{listPosts.listPosts.map((post: IPost) => (
-					<li key={post.id}>
-						<h4>{post.title}</h4>
-						<p>{post.body}</p>
-						<hr />
-					</li>
-				))}
-			</ul>
-		</div>
+		<>
+			<Head>
+				<title>Latest Posts</title>
+			</Head>
+
+			<Header />
+
+			<StyledMain>
+				<h2>Latest Posts</h2>
+
+				<ListPosts />
+			</StyledMain>
+		</>
 	);
 };
 
-export default connect((state) => state)(Index);
+export default Index;

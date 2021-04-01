@@ -8,7 +8,6 @@ export const fetchPostById = (postId: number) => (dispatch: Dispatch) =>
 	axios
 		.get(`${API_URL}/posts/${postId}?_embed=comments`)
 		.then(({ data }) => {
-			console.log(data);
 			dispatch({ type: FETCH_POST_BY_ID, payload: data });
 		})
 		.catch((err) => console.log(err));
