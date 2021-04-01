@@ -4,7 +4,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
 
 import { reducer } from "./components/reducers/reducer";
-import { IListPosts as IState } from "./types";
+import { IState } from "./types";
 
 export const makeStore: MakeStore<IState> = (context: Context) =>
 	createStore(reducer, composeWithDevTools(applyMiddleware(thunk)));
