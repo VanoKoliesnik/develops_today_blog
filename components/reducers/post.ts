@@ -2,7 +2,7 @@ import { AnyAction } from "redux";
 
 import { IPost } from "../../types";
 
-import { FETCH_POST_BY_ID, CREATE_POST } from "../../constants";
+import { FETCH_POST_BY_ID, CREATE_POST, CLEAN_UP_POST } from "../../constants";
 
 const initialState: IPost | null = null;
 
@@ -15,7 +15,10 @@ export const postReducer = (state: IPost = initialState, action: AnyAction) => {
 			};
 
 		case CREATE_POST:
-			return state
+			return state;
+
+		case CLEAN_UP_POST:
+			return null;
 
 		default:
 			return state;
