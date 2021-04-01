@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { Container, Form, Button } from "semantic-ui-react";
+import Head from "next/head";
 
 import Header from "../../components/Header";
 
 import { createPost } from "../../components/actions/post";
 
 const StyledMain = styled.main`
-	margin-top: 80px;
 	padding: 20px;
+	padding-top: 90px;
 `;
 
 const NewPost = ({ dispatch }) => {
@@ -17,26 +18,41 @@ const NewPost = ({ dispatch }) => {
 		title: "",
 		body: "",
 	});
-	function createNewPost() {
-		// TODO: make this works
-		console.log("todo");
+
+	function handleChange(e, { name, value }) {
+		setPost({
+			...post,
+			[name]: value,
+		});
+	}
+
+	function handleSubmit() {
+		setPost({
+			title: "",
+			body: "",
+		});
+		dispatch(createPost(post));
 	}
 
 	return (
 		<>
+			<Head>
+				<title>Create Post</title>
+			</Head>
+
 			<Header />
 
 			<StyledMain>
 				<Container>
-					<Form>
+					<Form onSubmit={handleSubmit}>
 						<Form.Field>
 							<label>Title:</label>
-							<Form.Input value={post.title} />
+							<Form.Input value={post.title} name="title" onChange={handleChange} />
 						</Form.Field>
 
 						<Form.Field>
 							<label>Content:</label>
-							<Form.TextArea value={post.body} />
+							<Form.TextArea value={post.body} name="body" onChange={handleChange} />
 						</Form.Field>
 						<Button color="black" type="submit">
 							Create!

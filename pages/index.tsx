@@ -7,7 +7,7 @@ import ListPosts from "../components/ListPosts";
 
 const StyledMain = styled.main`
 	padding: 20px;
-	padding-top: 80px;
+	padding-top: 90px;
 	height: 100vh;
 `;
 
