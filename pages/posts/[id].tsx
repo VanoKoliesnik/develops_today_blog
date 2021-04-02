@@ -77,22 +77,16 @@ const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
 	return (
 		<Grid>
 			<Grid.Row>
-				<Grid.Column floated="left" mobile={16} tablet={8}>
+				<Grid.Column width={16}>
 					<h2>{post.post.title}</h2>
 				</Grid.Column>
 
-				<Grid.Column floated="right" textAlign="right" mobile={16} tablet={8}>
-					<button>🖊</button>
-					<button>❌</button>
-				</Grid.Column>
-			</Grid.Row>
-
-			<Grid.Row>
-				<Grid.Column>
+				<Grid.Column width={16}>
 					<p>{post.post.body}</p>
 				</Grid.Column>
 			</Grid.Row>
 
+			<Divider />
 			<Grid.Row>
 				<Grid.Column>
 					<NewComment dispatch={dispatch} postId={post.post.id} />
