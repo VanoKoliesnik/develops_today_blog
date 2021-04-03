@@ -5,8 +5,10 @@ export interface IComment {
 }
 
 export interface IPost {
-	title: string;
-	body: string;
+	loading?: number;
+	error?: Error | null;
+	title?: string;
+	body?: string;
 	id?: number;
 	comments?: IComment[];
 }

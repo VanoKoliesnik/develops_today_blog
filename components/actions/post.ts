@@ -1,47 +1,67 @@
 import axios from "axios";
 import { Dispatch } from "redux";
 
-import { API_URL, FETCH_POST_BY_ID, CLEAN_UP_POST } from "../../constants";
+import {
+	API_URL,
+	FETCH_POST_BY_ID,
+	CLEAN_UP_POST,
+	BEGIN_LOADING,
+	END_LOADING,
+	CREATE_ERROR,
+	REMOVE_ERROR,
+} from "../../constants";
 import { IComment, IPost } from "../../types";
 
-// * BEGIN API SECTION
-const apiFetchPostById = (postId: number, dispatch: Dispatch) => {
+export const fetchPostById = (postId: number) => (dispatch: Dispatch) => {
+	dispatch({ type: BEGIN_LOADING });
 	return axios
 		.get(`${API_URL}/posts/${postId}?_embed=comments`)
 		.then(({ data }) => {
+			dispatch({ type: END_LOADING });
+			dispatch({ type: REMOVE_ERROR });
 			dispatch({ type: FETCH_POST_BY_ID, payload: data });
 		})
-		.catch((err) => console.log(err));
-};
-
-const apiCreatePost = (post: IPost, dispatch: Dispatch) => {
-	return axios
-		.post(`${API_URL}/posts`, post)
-		.then((res) => console.log(res))
-		.catch((err) => console.log(err));
-};
-
-const apiCreateComment = (comment: IComment, dispatch: Dispatch) => {
-	return axios
-		.post(`${API_URL}/comments`, comment)
-		.then((res) => {
-			apiFetchPostById(comment.postId, dispatch);
-			console.log(res);
-		})
-		.catch((err) => console.log(err));
-};
-// * END API SECTION
-
-export const fetchPostById = (postId: number) => (dispatch: Dispatch) => {
-	return apiFetchPostById(postId, dispatch);
+		.catch((err) => {
+			dispatch({ type: END_LOADING });
+			dispatch({ type: CREATE_ERROR, payload: err });
+		});
 };
 
 export const createPost = (post: IPost) => (dispatch: Dispatch) => {
-	return apiCreatePost(post, dispatch);
+	dispatch({ type: BEGIN_LOADING });
+	return axios
+		.post(`${API_URL}/posts`, post)
+		.then(() => {
+			dispatch({ type: END_LOADING });
+			dispatch({ type: REMOVE_ERROR });
+		})
+		.catch((err) => {
+			dispatch({ type: END_LOADING });
+			dispatch({ type: CREATE_ERROR, payload: err });
+		});
 };
 
 export const createComment = (comment: IComment) => (dispatch: Dispatch) => {
-	return apiCreateComment(comment, dispatch);
+	dispatch({ type: BEGIN_LOADING });
+	return axios
+		.post(`${API_URL}/comments`, comment)
+		.then(() => {
+			axios
+				.get(`${API_URL}/posts/${comment.postId}?_embed=comments`)
+				.then(({ data }) => {
+					dispatch({ type: END_LOADING });
+					dispatch({ type: REMOVE_ERROR });
+					dispatch({ type: FETCH_POST_BY_ID, payload: data });
+				})
+				.catch((err) => {
+					dispatch({ type: END_LOADING });
+					dispatch({ type: CREATE_ERROR, payload: err });
+				});
+		})
+		.catch((err) => {
+			dispatch({ type: END_LOADING });
+			dispatch({ type: CREATE_ERROR, payload: err });
+		});
 };
 
 export const cleanUpPost = () => (dispatch: Dispatch) => {

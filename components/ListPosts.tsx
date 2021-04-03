@@ -6,20 +6,7 @@ import { Card, Icon, Loader, Message } from "semantic-ui-react";
 import { fetchListPosts } from "./actions/listPosts";
 import { IPost } from "../types";
 
-const ErrorMessage = (error) => (
-	<Message error>
-		<Message.Header>Ooops.. Something went wrong! 😱</Message.Header>
-
-		<p>
-			Please, try again later. If error still alive, contact me{" "}
-			<a
-				href={`mailto:kolesnikivan1002@gmail.com?subject=DevelopsToday's Blog Error&body=Error log: ${error}`}
-			>
-				contact me 📧
-			</a>
-		</p>
-	</Message>
-);
+import ErrorMessage from "./ErrorMessage";
 
 const InfoMessage = () => (
 	<Message warning>
@@ -65,10 +52,10 @@ const ListPosts = (props) => {
 		<>
 			{listPosts.loading ? (
 				<Loader active />
-			) : listPosts.listPosts.length === 0 ? (
-				<InfoMessage />
 			) : listPosts.error ? (
 				<ErrorMessage error={listPosts.error} />
+			) : listPosts.listPosts.length === 0 ? (
+				<InfoMessage />
 			) : (
 				<CardGroup posts={listPosts.listPosts} />
 			)}

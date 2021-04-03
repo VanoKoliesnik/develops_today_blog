@@ -4,10 +4,11 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import Head from "next/head";
-import { Button, Divider, Form, Grid } from "semantic-ui-react";
+import { Button, Divider, Form, Grid, Loader } from "semantic-ui-react";
 
 import Header from "../../components/Header";
 import CommentItem from "../../components/CommentItem";
+import ErrorMessage from "../../components/ErrorMessage";
 
 import { fetchPostById, cleanUpPost, createComment } from "../../components/actions/post";
 import { IPost } from "../../types";
@@ -19,9 +20,7 @@ const StyledMain = styled.main`
 
 interface IPostItemProps {
 	dispatch: Dispatch;
-	post: {
-		post: IPost;
-	};
+	post: IPost;
 }
 
 const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
@@ -29,29 +28,29 @@ const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
 		<Grid.Column>
 			<Grid.Row>
 				<Grid.Column width={16}>
-					<h2>{post.post.title}</h2>
+					<h2>{post.title}</h2>
 				</Grid.Column>
 
 				<Grid.Column width={16}>
-					<p>{post.post.body}</p>
+					<p>{post.body}</p>
 				</Grid.Column>
 			</Grid.Row>
 
 			<Divider />
 			<Grid.Row>
 				<Grid.Column>
-					<NewComment dispatch={dispatch} postId={post.post.id} />
+					<NewComment dispatch={dispatch} postId={post.id} />
 				</Grid.Column>
 			</Grid.Row>
 
-			{post.post.comments.length ? (
+			{post.comments.length ? (
 				<Divider>
 					<Divider />
 					<Grid.Row columns={1}>
 						<Grid.Column>
 							<h3>Comment Section</h3>
 						</Grid.Column>
-						{post.post.comments.map((comment) => (
+						{post.comments.map((comment) => (
 							<Grid.Column key={comment.id}>
 								<CommentItem comment={comment} />
 							</Grid.Column>
@@ -81,16 +80,21 @@ const NewComment = ({ dispatch, postId }) => {
 	}
 
 	return (
-		<Form onSubmit={handleCreateComment}>
-			<Form.Field>
-				<label>Comment:</label>
-				<Form.TextArea value={commentBody} name="body" onChange={handleChange} />
-			</Form.Field>
+		<Grid stretched fluid>
+			<Grid.Column tablet={4} computer={4} largeScreen={5} widescreen={5} />
+			<Grid.Column mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
+				<Form onSubmit={handleCreateComment}>
+					<Form.Field>
+						<label>Comment:</label>
+						<Form.TextArea value={commentBody} name="body" onChange={handleChange} />
+					</Form.Field>
 
-			<Button color="black" type="submit">
-				Add comment
-			</Button>
-		</Form>
+					<Button color="black" type="submit">
+						Add comment
+					</Button>
+				</Form>
+			</Grid.Column>
+		</Grid>
 	);
 };
 
@@ -98,7 +102,7 @@ const Post = ({ dispatch, post }) => {
 	const { id } = useRouter().query;
 
 	useEffect(() => {
-		dispatch(fetchPostById(+id));
+		id ? dispatch(fetchPostById(+id)) : null;
 	}, [dispatch, id]);
 
 	useEffect(() => {
@@ -114,9 +118,14 @@ const Post = ({ dispatch, post }) => {
 			</Head>
 
 			<Header />
-
 			<StyledMain>
-				{post ? <PostItem dispatch={dispatch} post={post} /> : <p>Loading ...</p>}
+				{post.loading ? (
+					<Loader active />
+				) : post.error ? (
+					<ErrorMessage error={post.error} />
+				) : post.post ? (
+					<PostItem dispatch={dispatch} post={post.post} />
+				) : null}
 			</StyledMain>
 		</>
 	);
