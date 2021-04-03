@@ -13,6 +13,8 @@ export interface IPost {
 
 export interface IListPosts {
 	listPosts: IPost[] | [];
+	loading: number;
+	error?: Error;
 }
 
 export interface IState {

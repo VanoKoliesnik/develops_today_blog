@@ -4,9 +4,10 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import Head from "next/head";
-import { Button, Comment, Divider, Form, Grid, Image } from "semantic-ui-react";
+import { Button, Divider, Form, Grid } from "semantic-ui-react";
 
 import Header from "../../components/Header";
+import CommentItem from "../../components/CommentItem";
 
 import { fetchPostById, cleanUpPost, createComment } from "../../components/actions/post";
 import { IPost } from "../../types";
@@ -16,10 +17,6 @@ const StyledMain = styled.main`
 	padding-top: 90px;
 `;
 
-const StyledComment = styled(Comment)`
-	margin: 20px 40px;
-`;
-
 interface IPostItemProps {
 	dispatch: Dispatch;
 	post: {
@@ -27,20 +24,44 @@ interface IPostItemProps {
 	};
 }
 
-const CommentItem = ({ comment }) => (
-	<StyledComment key={comment.id}>
-		<Comment.Content>
-			<Image
-				avatar
-				fluid
-				rounded={false}
-				src={`https://avatar.oxro.io/avatar.svg?name=${comment.id[0].toUpperCase()}&background=1b1c1d&length=1`}
-			/>
+const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
+	return (
+		<Grid.Column>
+			<Grid.Row>
+				<Grid.Column width={16}>
+					<h2>{post.post.title}</h2>
+				</Grid.Column>
 
-			{comment.body}
-		</Comment.Content>
-	</StyledComment>
-);
+				<Grid.Column width={16}>
+					<p>{post.post.body}</p>
+				</Grid.Column>
+			</Grid.Row>
+
+			<Divider />
+			<Grid.Row>
+				<Grid.Column>
+					<NewComment dispatch={dispatch} postId={post.post.id} />
+				</Grid.Column>
+			</Grid.Row>
+
+			{post.post.comments.length ? (
+				<Divider>
+					<Divider />
+					<Grid.Row columns={1}>
+						<Grid.Column>
+							<h3>Comment Section</h3>
+						</Grid.Column>
+						{post.post.comments.map((comment) => (
+							<Grid.Column key={comment.id}>
+								<CommentItem comment={comment} />
+							</Grid.Column>
+						))}
+					</Grid.Row>
+				</Divider>
+			) : null}
+		</Grid.Column>
+	);
+};
 
 const NewComment = ({ dispatch, postId }) => {
 	const [commentBody, setCommentBody] = useState("");
@@ -70,45 +91,6 @@ const NewComment = ({ dispatch, postId }) => {
 				Add comment
 			</Button>
 		</Form>
-	);
-};
-
-const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
-	return (
-		<Grid>
-			<Grid.Row>
-				<Grid.Column width={16}>
-					<h2>{post.post.title}</h2>
-				</Grid.Column>
-
-				<Grid.Column width={16}>
-					<p>{post.post.body}</p>
-				</Grid.Column>
-			</Grid.Row>
-
-			<Divider />
-			<Grid.Row>
-				<Grid.Column>
-					<NewComment dispatch={dispatch} postId={post.post.id} />
-				</Grid.Column>
-			</Grid.Row>
-
-			{post.post.comments.length ? (
-				<>
-					<Divider />
-					<Grid.Row columns={1}>
-						<Grid.Column>
-							<h3>Comment Section</h3>
-						</Grid.Column>
-						{post.post.comments.map((comment) => (
-							<Grid.Column key={comment.id}>
-								<CommentItem comment={comment} />
-							</Grid.Column>
-						))}
-					</Grid.Row>
-				</>
-			) : null}
-		</Grid>
 	);
 };
 
