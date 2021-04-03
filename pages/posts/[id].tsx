@@ -1,56 +1,65 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import styled from "styled-components";
 import Head from "next/head";
-import { Button, Divider, Form, Grid, Loader } from "semantic-ui-react";
+import Link from "next/link";
+import { Button, Divider, Form, Grid, Loader, Message } from "semantic-ui-react";
 
 import Header from "../../components/Header";
 import CommentItem from "../../components/CommentItem";
 import ErrorMessage from "../../components/ErrorMessage";
 
-import { fetchPostById, cleanUpPost, createComment } from "../../components/actions/post";
-import { IPost } from "../../types";
+import {
+	fetchPostById,
+	cleanUpPost,
+	createComment,
+	deletePost,
+} from "../../components/actions/post";
 
 const StyledMain = styled.main`
 	padding: 20px;
 	padding-top: 90px;
 `;
 
-interface IPostItemProps {
-	dispatch: Dispatch;
-	post: IPost;
-}
+const PostItem = ({ dispatch, post, loading, error, removed }) => {
+	function handleDeletePost() {
+		dispatch(deletePost(post.post.id));
+	}
 
-const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
 	return (
-		<Grid.Column>
-			<Grid.Row>
-				<Grid.Column width={16}>
-					<h2>{post.title}</h2>
+		<Grid>
+			<Grid.Row columns={1}>
+				<Grid.Column>
+					<h2>{post.post.title}</h2>
 				</Grid.Column>
 
-				<Grid.Column width={16}>
-					<p>{post.body}</p>
+				<Grid.Column>
+					<p>{post.post.body}</p>
+				</Grid.Column>
+			</Grid.Row>
+
+			<Grid.Row>
+				<Grid.Column>
+					<Button onClick={handleDeletePost}>❌</Button>
 				</Grid.Column>
 			</Grid.Row>
 
 			<Divider />
 			<Grid.Row>
 				<Grid.Column>
-					<NewComment dispatch={dispatch} postId={post.id} />
+					<NewComment dispatch={dispatch} postId={post.post.id} />
 				</Grid.Column>
 			</Grid.Row>
 
-			{post.comments.length ? (
+			{post.post.comments.length ? (
 				<Divider>
 					<Divider />
 					<Grid.Row columns={1}>
 						<Grid.Column>
 							<h3>Comment Section</h3>
 						</Grid.Column>
-						{post.comments.map((comment) => (
+						{post.post.comments.map((comment) => (
 							<Grid.Column key={comment.id}>
 								<CommentItem comment={comment} />
 							</Grid.Column>
@@ -58,7 +67,7 @@ const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
 					</Grid.Row>
 				</Divider>
 			) : null}
-		</Grid.Column>
+		</Grid>
 	);
 };
 
@@ -80,7 +89,7 @@ const NewComment = ({ dispatch, postId }) => {
 	}
 
 	return (
-		<Grid stretched fluid>
+		<Grid stretched>
 			<Grid.Column tablet={4} computer={4} largeScreen={5} widescreen={5} />
 			<Grid.Column mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
 				<Form onSubmit={handleCreateComment}>
@@ -98,7 +107,8 @@ const NewComment = ({ dispatch, postId }) => {
 	);
 };
 
-const Post = ({ dispatch, post }) => {
+const Post = (props) => {
+	const { dispatch, post } = props;
 	const { id } = useRouter().query;
 
 	useEffect(() => {
@@ -123,8 +133,17 @@ const Post = ({ dispatch, post }) => {
 					<Loader active />
 				) : post.error ? (
 					<ErrorMessage error={post.error} />
+				) : post.removed ? (
+					<Message warning>
+						<Message.Header>Post has been removed! 👌</Message.Header>
+
+						<p>
+							You can write a <Link href="/posts/new">new post</Link> or{" "}
+							<Link href="/">explore</Link> something else.
+						</p>
+					</Message>
 				) : post.post ? (
-					<PostItem dispatch={dispatch} post={post.post} />
+					<PostItem {...props} />
 				) : null}
 			</StyledMain>
 		</>

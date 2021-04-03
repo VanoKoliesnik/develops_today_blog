@@ -5,6 +5,7 @@ import { IPost } from "../../types";
 import {
 	FETCH_POST_BY_ID,
 	CREATE_POST,
+	DELETE_POST,
 	CREATE_COMMENT,
 	CLEAN_UP_POST,
 	BEGIN_LOADING,
@@ -28,6 +29,12 @@ export const postReducer = (state: IPost = initialState, action: AnyAction) => {
 
 		case CREATE_POST:
 			return state;
+
+		case DELETE_POST:
+			return {
+				...initialState,
+				removed: true,
+			};
 
 		case CREATE_COMMENT:
 			return state;

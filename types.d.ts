@@ -11,6 +11,7 @@ export interface IPost {
 	body?: string;
 	id?: number;
 	comments?: IComment[];
+	removed?: boolean;
 }
 
 export interface IListPosts {
