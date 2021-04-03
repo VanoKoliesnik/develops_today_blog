@@ -26,7 +26,9 @@ const CardGroup = ({ posts }) => (
 					<Card.Content>
 						<Card.Header>{post.title}</Card.Header>
 
-						<Card.Description>{post.body}</Card.Description>
+						<Card.Description>
+							{post.body.length >= 200 ? `${post.body.slice(0, 200)} ...` : post.body}
+						</Card.Description>
 					</Card.Content>
 					{post.comments ? (
 						<Card.Content extra>
