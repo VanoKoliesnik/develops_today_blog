@@ -6,6 +6,54 @@ import { Card, Icon, Loader, Message } from "semantic-ui-react";
 import { fetchListPosts } from "./actions/listPosts";
 import { IPost } from "../types";
 
+const ErrorMessage = (error) => (
+	<Message error>
+		<Message.Header>Ooops.. Something went wrong! 😱</Message.Header>
+
+		<p>
+			Please, try again later. If error still alive, contact me{" "}
+			<a
+				href={`mailto:kolesnikivan1002@gmail.com?subject=DevelopsToday's Blog Error&body=Error log: ${error}`}
+			>
+				contact me 📧
+			</a>
+		</p>
+	</Message>
+);
+
+const InfoMessage = () => (
+	<Message warning>
+		<Message.Header>There's nothing to display. 🤔</Message.Header>
+		<p>
+			You can be the first to add a new post here! Just{" "}
+			<Link href="/posts/new">Create Post</Link>
+		</p>
+	</Message>
+);
+
+const CardGroup = ({ posts }) => (
+	<Card.Group centered stackable itemsPerRow={2}>
+		{posts.map((post: IPost) => (
+			<Link href={`/posts/${post.id}`} key={post.id}>
+				<Card>
+					<Card.Content>
+						<Card.Header>{post.title}</Card.Header>
+
+						<Card.Description>{post.body}</Card.Description>
+					</Card.Content>
+					{post.comments ? (
+						<Card.Content extra>
+							<Icon name="comment" />
+							{post.comments.length} comment
+							{post.comments.length === 1 ? null : "s"}
+						</Card.Content>
+					) : null}
+				</Card>
+			</Link>
+		))}
+	</Card.Group>
+);
+
 const ListPosts = (props) => {
 	const { dispatch, listPosts } = props;
 
@@ -17,50 +65,12 @@ const ListPosts = (props) => {
 		<>
 			{listPosts.loading ? (
 				<Loader active />
+			) : listPosts.listPosts.length === 0 ? (
+				<InfoMessage />
 			) : listPosts.error ? (
-				<Message warning>
-					<Message.Header>Ooops.. Something went wrong! 😱</Message.Header>
-
-					<p>
-						Please, try again later. If error still alive, contact me{" "}
-						<a
-							href={`mailto:kolesnikivan1002@gmail.com?subject=DevelopsToday's Blog Error&body=Error log: ${listPosts.error}`}
-						>
-							contact me 📧
-						</a>
-					</p>
-				</Message>
-			) : // todo: complete view logic
-			listPosts.listPosts === [] ? (
-				<Message warning>
-					<Message.Header>There's nothing to display. 🤔</Message.Header>
-
-					<p>
-						You can be the first to add a new post here! Just{" "}
-						<Link href="/posts/new">Create Post</Link>
-					</p>
-				</Message>
+				<ErrorMessage error={listPosts.error} />
 			) : (
-				<Card.Group centered stackable itemsPerRow={2}>
-					{listPosts.listPosts.map((post: IPost) => (
-						<Link href={`/posts/${post.id}`} key={post.id}>
-							<Card>
-								<Card.Content>
-									<Card.Header>{post.title}</Card.Header>
-
-									<Card.Description>{post.body}</Card.Description>
-								</Card.Content>
-								{post.comments ? (
-									<Card.Content extra>
-										<Icon name="comment" />
-										{post.comments.length} comment
-										{post.comments.length === 1 ? null : "s"}
-									</Card.Content>
-								) : null}
-							</Card>
-						</Link>
-					))}
-				</Card.Group>
+				<CardGroup posts={listPosts.listPosts} />
 			)}
 		</>
 	);

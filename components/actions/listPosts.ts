@@ -6,7 +6,8 @@ import {
 	FETCH_LIST_OF_POSTS,
 	BEGIN_LOADING,
 	END_LOADING,
-	SET_ERROR,
+	CREATE_ERROR,
+	REMOVE_ERROR,
 } from "../../constants";
 
 export const fetchListPosts = () => (dispatch: Dispatch) => {
@@ -16,9 +17,10 @@ export const fetchListPosts = () => (dispatch: Dispatch) => {
 		.then(({ data }) => {
 			dispatch({ type: END_LOADING });
 			dispatch({ type: FETCH_LIST_OF_POSTS, payload: data });
+			dispatch({ type: REMOVE_ERROR });
 		})
 		.catch((err) => {
 			dispatch({ type: END_LOADING });
-			dispatch({ type: SET_ERROR, payload: err });
+			dispatch({ type: CREATE_ERROR, payload: err });
 		});
 };

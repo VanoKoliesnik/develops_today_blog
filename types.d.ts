@@ -14,7 +14,7 @@ export interface IPost {
 export interface IListPosts {
 	listPosts: IPost[] | [];
 	loading: number;
-	error?: Error;
+	error: Error | null;
 }
 
 export interface IState {
