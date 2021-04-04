@@ -53,11 +53,11 @@ const PostItem = ({ dispatch, post, loading, error, removed }) => {
 			</Grid.Row>
 
 			{post.post.comments.length ? (
-				<Divider>
+				<>
 					<Divider />
 					<Grid.Row columns={1}>
 						<Grid.Column>
-							<h3>Comment Section</h3>
+							<h3>Comments</h3>
 						</Grid.Column>
 						{post.post.comments.map((comment) => (
 							<Grid.Column key={comment.id}>
@@ -65,7 +65,7 @@ const PostItem = ({ dispatch, post, loading, error, removed }) => {
 							</Grid.Column>
 						))}
 					</Grid.Row>
-				</Divider>
+				</>
 			) : null}
 		</Grid>
 	);
