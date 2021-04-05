@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Comment,Image } from "semantic-ui-react";
+import { Comment, Image } from "semantic-ui-react";
 
 const StyledComment = styled(Comment)`
 	margin: 20px 40px;

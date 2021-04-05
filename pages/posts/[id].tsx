@@ -22,7 +22,7 @@ const StyledMain = styled.main`
 	padding-top: 90px;
 `;
 
-const PostItem = ({ dispatch, post, loading, error, removed }) => {
+const PostItem = ({ dispatch, post }) => {
 	function handleDeletePost() {
 		dispatch(deletePost(post.post.id));
 	}
