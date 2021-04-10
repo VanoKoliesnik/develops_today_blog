@@ -6,7 +6,9 @@
 	"scripts": {
 		"dev": "next",
 		"build": "next build",
-		"start": "next start"
+		"start": "next start",
+		"prettier:check": "prettier --check store.ts {components,pages}/**",
+		"prettier:format": "prettier --write store.ts {components,pages}/**"
 	},
 	"keywords": [],
 	"author": "Ivan Koliesnik [kolesnikivan1002@gmail.com]",

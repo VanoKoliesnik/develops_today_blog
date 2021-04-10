@@ -1,46 +1,75 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import styled from "styled-components";
 import Head from "next/head";
-import { Button, Comment, Divider, Form, Grid, Image } from "semantic-ui-react";
+import Link from "next/link";
+import { Button, Divider, Form, Grid, Loader, Message } from "semantic-ui-react";
 
 import Header from "../../components/Header";
+import CommentItem from "../../components/CommentItem";
+import ErrorMessage from "../../components/ErrorMessage";
 
-import { fetchPostById, cleanUpPost, createComment } from "../../components/actions/post";
-import { IPost } from "../../types";
+import {
+	fetchPostById,
+	cleanUpPost,
+	createComment,
+	deletePost,
+} from "../../components/actions/post";
 
 const StyledMain = styled.main`
 	padding: 20px;
 	padding-top: 90px;
 `;
 
-const StyledComment = styled(Comment)`
-	margin: 20px 40px;
-`;
+const PostItem = ({ dispatch, post }) => {
+	function handleDeletePost() {
+		dispatch(deletePost(post.post.id));
+	}
 
-interface IPostItemProps {
-	dispatch: Dispatch;
-	post: {
-		post: IPost;
-	};
-}
+	return (
+		<Grid>
+			<Grid.Row columns={1}>
+				<Grid.Column>
+					<h2>{post.post.title}</h2>
+				</Grid.Column>
 
-const CommentItem = ({ comment }) => (
-	<StyledComment key={comment.id}>
-		<Comment.Content>
-			<Image
-				avatar
-				fluid
-				rounded={false}
-				src={`https://avatar.oxro.io/avatar.svg?name=${comment.id[0].toUpperCase()}&background=1b1c1d&length=1`}
-			/>
+				<Grid.Column>
+					<p>{post.post.body}</p>
+				</Grid.Column>
+			</Grid.Row>
 
-			{comment.body}
-		</Comment.Content>
-	</StyledComment>
-);
+			<Grid.Row>
+				<Grid.Column>
+					<Button onClick={handleDeletePost}>❌</Button>
+				</Grid.Column>
+			</Grid.Row>
+
+			<Divider />
+			<Grid.Row>
+				<Grid.Column>
+					<NewComment dispatch={dispatch} postId={post.post.id} />
+				</Grid.Column>
+			</Grid.Row>
+
+			{post.post.comments.length ? (
+				<>
+					<Divider />
+					<Grid.Row columns={1}>
+						<Grid.Column>
+							<h3>Comments</h3>
+						</Grid.Column>
+						{post.post.comments.map((comment) => (
+							<Grid.Column key={comment.id}>
+								<CommentItem comment={comment} />
+							</Grid.Column>
+						))}
+					</Grid.Row>
+				</>
+			) : null}
+		</Grid>
+	);
+};
 
 const NewComment = ({ dispatch, postId }) => {
 	const [commentBody, setCommentBody] = useState("");
@@ -60,63 +89,30 @@ const NewComment = ({ dispatch, postId }) => {
 	}
 
 	return (
-		<Form onSubmit={handleCreateComment}>
-			<Form.Field>
-				<label>Comment:</label>
-				<Form.TextArea value={commentBody} name="body" onChange={handleChange} />
-			</Form.Field>
+		<Grid stretched>
+			<Grid.Column tablet={4} computer={4} largeScreen={5} widescreen={5} />
+			<Grid.Column mobile={16} tablet={8} computer={8} largeScreen={6} widescreen={6}>
+				<Form onSubmit={handleCreateComment}>
+					<Form.Field>
+						<label>Comment:</label>
+						<Form.TextArea value={commentBody} name="body" onChange={handleChange} />
+					</Form.Field>
 
-			<Button color="black" type="submit">
-				Add comment
-			</Button>
-		</Form>
-	);
-};
-
-const PostItem: FC<IPostItemProps> = ({ dispatch, post }) => {
-	return (
-		<Grid>
-			<Grid.Row>
-				<Grid.Column width={16}>
-					<h2>{post.post.title}</h2>
-				</Grid.Column>
-
-				<Grid.Column width={16}>
-					<p>{post.post.body}</p>
-				</Grid.Column>
-			</Grid.Row>
-
-			<Divider />
-			<Grid.Row>
-				<Grid.Column>
-					<NewComment dispatch={dispatch} postId={post.post.id} />
-				</Grid.Column>
-			</Grid.Row>
-
-			{post.post.comments.length ? (
-				<>
-					<Divider />
-					<Grid.Row columns={1}>
-						<Grid.Column>
-							<h3>Comment Section</h3>
-						</Grid.Column>
-						{post.post.comments.map((comment) => (
-							<Grid.Column key={comment.id}>
-								<CommentItem comment={comment} />
-							</Grid.Column>
-						))}
-					</Grid.Row>
-				</>
-			) : null}
+					<Button color="black" type="submit">
+						Add comment
+					</Button>
+				</Form>
+			</Grid.Column>
 		</Grid>
 	);
 };
 
-const Post = ({ dispatch, post }) => {
+const Post = (props) => {
+	const { dispatch, post } = props;
 	const { id } = useRouter().query;
 
 	useEffect(() => {
-		dispatch(fetchPostById(+id));
+		id ? dispatch(fetchPostById(+id)) : null;
 	}, [dispatch, id]);
 
 	useEffect(() => {
@@ -132,9 +128,23 @@ const Post = ({ dispatch, post }) => {
 			</Head>
 
 			<Header />
-
 			<StyledMain>
-				{post ? <PostItem dispatch={dispatch} post={post} /> : <p>Loading ...</p>}
+				{post.loading ? (
+					<Loader active />
+				) : post.error ? (
+					<ErrorMessage error={post.error} />
+				) : post.removed ? (
+					<Message warning>
+						<Message.Header>Post has been removed! 👌</Message.Header>
+
+						<p>
+							You can write a <Link href="/posts/new">new post</Link> or{" "}
+							<Link href="/">explore</Link> something else.
+						</p>
+					</Message>
+				) : post.post ? (
+					<PostItem {...props} />
+				) : null}
 			</StyledMain>
 		</>
 	);
