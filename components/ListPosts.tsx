@@ -20,26 +20,32 @@ const InfoMessage = () => (
 
 const CardGroup = ({ posts }) => (
 	<Card.Group centered stackable itemsPerRow={2}>
-		{posts.map((post: IPost) => (
-			<Link href={`/posts/${post.id}`} key={post.id}>
-				<Card>
-					<Card.Content>
-						<Card.Header>{post.title}</Card.Header>
+		{posts.map((post: IPost) =>
+			post.title ? (
+				post.body ? (
+					<Link href={`/posts/${post.id}`} key={post.id}>
+						<Card>
+							<Card.Content>
+								<Card.Header>{post.title}</Card.Header>
 
-						<Card.Description>
-							{post.body.length >= 200 ? `${post.body.slice(0, 200)} ...` : post.body}
-						</Card.Description>
-					</Card.Content>
-					{post.comments ? (
-						<Card.Content extra>
-							<Icon name="comment" />
-							{post.comments.length} comment
-							{post.comments.length === 1 ? null : "s"}
-						</Card.Content>
-					) : null}
-				</Card>
-			</Link>
-		))}
+								<Card.Description>
+									{post.body.length >= 200
+										? `${post.body.slice(0, 200)} ...`
+										: post.body}
+								</Card.Description>
+							</Card.Content>
+							{post.comments ? (
+								<Card.Content extra>
+									<Icon name="comment" />
+									{post.comments.length} comment
+									{post.comments.length === 1 ? null : "s"}
+								</Card.Content>
+							) : null}
+						</Card>
+					</Link>
+				) : null
+			) : null,
+		)}
 	</Card.Group>
 );
 
