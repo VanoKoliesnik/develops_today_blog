@@ -5,7 +5,7 @@ const ErrorMessage = (error) => (
 		<Message.Header>Ooops.. Something went wrong! 😱</Message.Header>
 
 		<p>
-			Please, try again later. If error still alive, contact me{" "}
+			Please, try again later. If error still alive, {" "}
 			<a
 				href={`mailto:kolesnikivan1002@gmail.com?subject=DevelopsToday's Blog Error&body=Error log: ${JSON.stringify(
 					error,
